@@ -12,14 +12,14 @@ interface Config extends LovelaceCardConfig {
 
 export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
   // internal reactive states
-  @state() private _header: string | typeof nothing;
-  @state() private _entity: string;
-  @state() private _name: string;
-  @state() private _state: HassEntity;
-  @state() private _status: string;
+  @state() private _header: string | typeof nothing = nothing;
+  @state() private _entity: string = '';
+  @state() private _name: string = '';
+  @state() private _state: HassEntity | undefined = undefined;
+  @state() private _status: string = '';
 
   // private property
-  private _hass;
+  private _hass: HomeAssistant | undefined;
 
   // lifecycle interface
   setConfig(config: Config) {
@@ -71,9 +71,11 @@ export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
 
   // event handling
   doToggle() {
-    this._hass.callService("input_boolean", "toggle", {
-      entity_id: this._entity,
-    });
+    if (this._hass && this._entity) {
+      this._hass.callService("input_boolean", "toggle", {
+        entity_id: this._entity,
+      });
+    }
   }
 
   // card configuration
