@@ -1,1 +1,0 @@
-# ahoj-tlacitko-upravitelne-hacs-ts
