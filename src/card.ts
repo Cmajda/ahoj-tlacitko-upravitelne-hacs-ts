@@ -45,8 +45,8 @@ export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
   }
 
   setConfig(config: any) {
-    this.header = config.header === '' ? '' : config.header;
-    this.entity = config.entity;
+    this.header = config.header || '';
+    this.entity = config.entity || '';
     if (this.hass) {
       this.hass = this.hass;
     }

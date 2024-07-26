@@ -20,8 +20,10 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@polymer/paper-input": "^3.2.1",
     "custom-card-helpers": "^1.9.0",
     "home-assistant-js-websocket": "^9.4.0",
-    "lit": "^2.8.0"
+    "lit": "^2.8.0",
+    "lit-element": "^3.3.3"
   }
 }

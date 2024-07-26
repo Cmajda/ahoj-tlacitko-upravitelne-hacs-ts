@@ -1,14 +1,5 @@
-import { AhojTlacitkoUpravitelneHacsTsScript } from "./card";
-import { AhojTlacitkoUpravitelneHacsTsEditor } from "./editor";
-
-customElements.define(
-  "ahoj-tlacitko-upravitelne-hacs-ts",
-  AhojTlacitkoUpravitelneHacsTsScript
-);
-customElements.define(
-  "ahoj-tlacitko-upravitelne-hacs-ts-editor",
-  AhojTlacitkoUpravitelneHacsTsEditor
-);
+import './card';
+import './editor';
 
 declare global {
   interface Window {
@@ -22,7 +13,7 @@ declare global {
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "custom:ahoj-tlacitko-upravitelne-hacs-ts",
-  name: "Toggle card with TypeScript",
-  description: "Turn an entity on and off",
+  type: 'custom:ahoj-tlacitko-upravitelne-hacs-ts',
+  name: 'Toggle card with TypeScript',
+  description: 'Turn an entity on and off',
 });

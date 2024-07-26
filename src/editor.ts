@@ -1,4 +1,5 @@
-import { LitElement, html, css, property, customElement } from 'lit-element';
+import { LitElement, html, property, customElement } from 'lit-element';
+import '@polymer/paper-input/paper-input';
 
 @customElement('my-card-editor')
 export class AhojTlacitkoUpravitelneHacsTsEditor extends LitElement {
@@ -11,12 +12,12 @@ export class AhojTlacitkoUpravitelneHacsTsEditor extends LitElement {
           <div class="card-config">
             <paper-input
               label="Header"
-              .value=${this.config.header}
+              .value=${this.config.header || ''}
               @value-changed=${this._handleHeaderChanged}
             ></paper-input>
             <paper-input
               label="Entity"
-              .value=${this.config.entity}
+              .value=${this.config.entity || ''}
               @value-changed=${this._handleEntityChanged}
             ></paper-input>
           </div>
@@ -28,12 +29,12 @@ export class AhojTlacitkoUpravitelneHacsTsEditor extends LitElement {
   private _handleHeaderChanged(event: Event) {
     const target = event.target as HTMLInputElement;
     this.config = { ...this.config, header: target.value };
-    this.requestUpdate();
+    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this.config } }));
   }
 
   private _handleEntityChanged(event: Event) {
     const target = event.target as HTMLInputElement;
     this.config = { ...this.config, entity: target.value };
-    this.requestUpdate();
+    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this.config } }));
   }
 }
