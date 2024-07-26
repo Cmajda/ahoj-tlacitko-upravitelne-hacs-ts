@@ -1,5 +1,5 @@
 import { css, html, LitElement } from "lit";
-import { state } from "lit/decorators/state";
+import { state } from "lit/decorators.js";
 
 // Definujte typ pro konfiguraci
 interface Config {
