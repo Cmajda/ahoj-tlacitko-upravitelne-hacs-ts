@@ -1,17 +1,19 @@
-import { css, html, LitElement } from "lit";
-import { state } from "lit/decorators.js";
+import { html, LitElement, css } from "lit";
+import { state, customElement, property } from "lit/decorators.js";
+import { HomeAssistant } from "custom-card-helpers";
 
-// Definujte typ pro konfiguraci
 interface Config {
+  type: string;
   header: string;
   entity: string;
 }
 
+@customElement("ahoj-tlacitko-upravitelne-hacs-ts-editor")
 export class AhojTlacitkoUpravitelneHacsTsEditor extends LitElement {
-  @state() private _config: Config = { header: '', entity: '' };
+  @state() private _config: Config = { type: 'custom:ahoj-tlacitko-upravitelne-hacs-ts', header: '', entity: '' };
+  @property({ attribute: false }) public hass!: HomeAssistant;
 
-  // Specifikujte typ pro parametr
-  setConfig(config: Config) {
+  public setConfig(config: Config): void {
     this._config = config;
   }
 
@@ -30,38 +32,44 @@ export class AhojTlacitkoUpravitelneHacsTsEditor extends LitElement {
 
   render() {
     return html`
-            <form class="table">
-                <div class="row">
-                    <label class="label cell" for="header">Header:</label>
-                    <input
-                        @change="${this.handleChangedEvent}"
-                        class="value cell" id="header" .value="${this._config.header}"></input>
-                </div>
-                <div class="row">
-                    <label class="label cell" for="entity">Entity:</label>
-                    <input
-                        @change="${this.handleChangedEvent}"
-                        class="value cell" id="entity" .value="${this._config.entity}"></input>
-                </div>
-            </form>
-        `;
+      <form class="table">
+        <div class="row">
+          <label class="label cell" for="header">Header:</label>
+          <input
+            @input="${this._handleChangedEvent}"
+            class="value cell"
+            id="header"
+            .value="${this._config.header}"
+          ></input>
+        </div>
+        <div class="row">
+          <label class="label cell" for="entity">Entity:</label>
+          <ha-entity-picker
+            .hass="${this.hass}"
+            .value="${this._config.entity}"
+            @value-changed="${this._handleEntityChanged}"
+            class="value cell"
+            id="entity"
+          ></ha-entity-picker>
+        </div>
+      </form>
+    `;
   }
 
-  // Typ pro event parameter
-  handleChangedEvent(changedEvent: Event) {
-    const target = changedEvent.target as HTMLInputElement;
-    // this._config is readonly, copy needed
+  private _handleChangedEvent(event: Event) {
+    const target = event.target as HTMLInputElement;
     const newConfig = { ...this._config };
+
     if (target.id === "header") {
       newConfig.header = target.value;
-    } else if (target.id === "entity") {
-      newConfig.entity = target.value;
     }
-    const messageEvent = new CustomEvent("config-changed", {
-      detail: { config: newConfig },
-      bubbles: true,
-      composed: true,
-    });
-    this.dispatchEvent(messageEvent);
+
+    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: newConfig }, bubbles: true, composed: true }));
+  }
+
+  private _handleEntityChanged(event: CustomEvent) {
+    const newConfig = { ...this._config };
+    newConfig.entity = event.detail.value;
+    this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: newConfig }, bubbles: true, composed: true }));
   }
 }

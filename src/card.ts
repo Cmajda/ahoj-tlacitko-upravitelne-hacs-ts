@@ -1,32 +1,25 @@
-import { html, LitElement, TemplateResult, nothing } from "lit";
-import { styles } from "./card.styles";
-import { state } from "lit/decorators.js";
-
-import { HassEntity } from "home-assistant-js-websocket";
+import { html, LitElement } from "lit";
+import { state, customElement, property } from "lit/decorators.js";
 import { HomeAssistant, LovelaceCardConfig } from "custom-card-helpers";
+import { styles } from "./card.styles";
 
 interface Config extends LovelaceCardConfig {
   header: string;
   entity: string;
 }
 
+@customElement("ahoj-tlacitko-upravitelne-hacs-ts")
 export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
-  // internal reactive states
-  @state() private _header: string | typeof nothing = nothing;
-  @state() private _entity: string = '';
-  @state() private _name: string = '';
-  @state() private _state: HassEntity | undefined = undefined;
-  @state() private _status: string = '';
+  @state() private _header = "";
+  @state() private _entity = "";
+  @state() private _name = "";
+  @state() private _state?: any;
+  @state() private _status = "";
+  @property({ attribute: false }) private _hass?: HomeAssistant;
 
-  // private property
-  private _hass: HomeAssistant | undefined;
-
-  // lifecycle interface
-  setConfig(config: Config) {
-    this._header = config.header === "" ? nothing : config.header;
+  public setConfig(config: Config): void {
+    this._header = config.header === "" ? "" : config.header;
     this._entity = config.entity;
-    // call set hass() to immediately adjust to a changed entity
-    // while editing the entity in the card editor
     if (this._hass) {
       this.hass = this._hass;
     }
@@ -42,13 +35,10 @@ export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
     }
   }
 
-  // declarative part
-  static styles = styles;
-
   render() {
-    let content: TemplateResult;
+    let content;
     if (!this._state) {
-      content = html` <p class="error">${this._entity} is unavailable.</p> `;
+      content = html`<p class="error">${this._entity} is unavailable.</p>`;
     } else {
       content = html`
         <dl class="dl">
@@ -69,7 +59,6 @@ export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
     `;
   }
 
-  // event handling
   doToggle() {
     if (this._hass && this._entity) {
       this._hass.callService("input_boolean", "toggle", {
@@ -78,15 +67,17 @@ export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
     }
   }
 
-  // card configuration
   static getConfigElement() {
     return document.createElement("ahoj-tlacitko-upravitelne-hacs-ts-editor");
   }
 
   static getStubConfig() {
     return {
+      type: "custom:ahoj-tlacitko-upravitelne-hacs-ts",
       entity: "input_boolean.tcts",
       header: "",
     };
   }
+
+  static styles = styles;
 }
