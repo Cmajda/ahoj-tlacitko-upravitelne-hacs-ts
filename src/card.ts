@@ -1,83 +1,64 @@
-import { html, LitElement } from "lit";
-import { state, customElement, property } from "lit/decorators.js";
-import { HomeAssistant, LovelaceCardConfig } from "custom-card-helpers";
-import { styles } from "./card.styles";
+import { LitElement, html, css, property, customElement } from 'lit-element';
 
-interface Config extends LovelaceCardConfig {
-  header: string;
-  entity: string;
-}
-
-@customElement("ahoj-tlacitko-upravitelne-hacs-ts")
+@customElement('ahoj-tlacitko-upravitelne-hacs-ts')
 export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
-  @state() private _header = "";
-  @state() private _entity = "";
-  @state() private _name = "";
-  @state() private _state?: any;
-  @state() private _status = "";
-  @property({ attribute: false }) private _hass?: HomeAssistant;
+  @property({ type: String }) private header = '';
+  @property({ type: String }) private entity = '';
+  @property({ type: String }) private name = '';
+  @property({ type: Object }) private state?: any;
+  @property({ type: String }) private status = '';
 
-  public setConfig(config: Config): void {
-    this._header = config.header === "" ? "" : config.header;
-    this._entity = config.entity;
-    if (this._hass) {
-      this.hass = this._hass;
-    }
-  }
-
-  set hass(hass: HomeAssistant) {
-    this._hass = hass;
-    this._state = hass.states[this._entity];
-    if (this._state) {
-      this._status = this._state.state;
-      let fn = this._state.attributes.friendly_name;
-      this._name = fn ? fn : this._entity;
-    }
-  }
+  static styles = css`
+    /* vaše styly */
+  `;
 
   render() {
     let content;
-    if (!this._state) {
-      content = html`<p class="error">${this._entity} is unavailable.</p>`;
+    if (!this.state) {
+      content = html` <p class="error">${this.entity} is unavailable.</p> `;
     } else {
       content = html`
         <dl class="dl">
-          <dt class="dt">${this._name}</dt>
+          <dt class="dt">${this.name}</dt>
           <dd class="dd" @click="${this.doToggle}">
-            <span class="toggle ${this._status}">
+            <span class="toggle ${this.status}">
               <span class="button"></span>
             </span>
-            <span class="value">${this._status}</span>
+            <span class="value">${this.status}</span>
           </dd>
         </dl>
       `;
     }
     return html`
-      <ha-card header="${this._header}">
+      <ha-card header="${this.header}">
         <div class="card-content">${content}</div>
       </ha-card>
     `;
   }
 
-  doToggle() {
-    if (this._hass && this._entity) {
-      this._hass.callService("input_boolean", "toggle", {
-        entity_id: this._entity,
+  private doToggle() {
+    if (this.hass && this.entity) {
+      this.hass.callService('input_boolean', 'toggle', {
+        entity_id: this.entity,
       });
     }
   }
 
-  static getConfigElement() {
-    return document.createElement("ahoj-tlacitko-upravitelne-hacs-ts-editor");
+  setConfig(config: any) {
+    this.header = config.header === '' ? '' : config.header;
+    this.entity = config.entity;
+    if (this.hass) {
+      this.hass = this.hass;
+    }
   }
 
-  static getStubConfig() {
-    return {
-      type: "custom:ahoj-tlacitko-upravitelne-hacs-ts",
-      entity: "input_boolean.tcts",
-      header: "",
-    };
+  set hass(hass: any) {
+    this.hass = hass;
+    this.state = hass.states[this.entity];
+    if (this.state) {
+      this.status = this.state.state;
+      let fn = this.state.attributes.friendly_name;
+      this.name = fn ? fn : this.entity;
+    }
   }
-
-  static styles = styles;
 }
