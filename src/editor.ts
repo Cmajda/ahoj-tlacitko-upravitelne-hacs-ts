@@ -1,40 +1,67 @@
-import { LitElement, html, property, customElement } from 'lit-element';
-import '@polymer/paper-input/paper-input';
+import { css, html, LitElement } from "lit";
+import { state } from "lit/decorators.js";
 
-@customElement('my-card-editor')
+// Definujte typ pro konfiguraci
+interface Config {
+  header: string;
+  entity: string;
+}
+
 export class AhojTlacitkoUpravitelneHacsTsEditor extends LitElement {
-  @property({ type: Object }) config: any = {};
+  @state() private _config: Config = { header: '', entity: '' };
+
+  // Specifikujte typ pro parametr
+  setConfig(config: Config) {
+    this._config = config;
+  }
+
+  static styles = css`
+    .table {
+      display: table;
+    }
+    .row {
+      display: table-row;
+    }
+    .cell {
+      display: table-cell;
+      padding: 0.5em;
+    }
+  `;
 
   render() {
     return html`
-      <div>
-        <ha-config-section>
-          <div class="card-config">
-            <paper-input
-              label="Header"
-              .value=${this.config.header || ''}
-              @value-changed=${this._handleHeaderChanged}
-            ></paper-input>
-            <paper-input
-              label="Entity"
-              .value=${this.config.entity || ''}
-              @value-changed=${this._handleEntityChanged}
-            ></paper-input>
-          </div>
-        </ha-config-section>
-      </div>
-    `;
+            <form class="table">
+                <div class="row">
+                    <label class="label cell" for="header">Header:</label>
+                    <input
+                        @change="${this.handleChangedEvent}"
+                        class="value cell" id="header" .value="${this._config.header}"></input>
+                </div>
+                <div class="row">
+                    <label class="label cell" for="entity">Entity:</label>
+                    <input
+                        @change="${this.handleChangedEvent}"
+                        class="value cell" id="entity" .value="${this._config.entity}"></input>
+                </div>
+            </form>
+        `;
   }
 
-  private _handleHeaderChanged(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.config = { ...this.config, header: target.value };
-    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this.config } }));
-  }
-
-  private _handleEntityChanged(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.config = { ...this.config, entity: target.value };
-    this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: this.config } }));
+  // Typ pro event parameter
+  handleChangedEvent(changedEvent: Event) {
+    const target = changedEvent.target as HTMLInputElement;
+    // this._config is readonly, copy needed
+    const newConfig = { ...this._config };
+    if (target.id === "header") {
+      newConfig.header = target.value;
+    } else if (target.id === "entity") {
+      newConfig.entity = target.value;
+    }
+    const messageEvent = new CustomEvent("config-changed", {
+      detail: { config: newConfig },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(messageEvent);
   }
 }
