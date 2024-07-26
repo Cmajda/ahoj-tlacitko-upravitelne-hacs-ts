@@ -53,11 +53,10 @@ export class AhojTlacitkoUpravitelneHacsTsScript extends LitElement {
   }
 
   set hass(hass: any) {
-    this.hass = hass;
     this.state = hass.states[this.entity];
     if (this.state) {
       this.status = this.state.state;
-      let fn = this.state.attributes.friendly_name;
+      const fn = this.state.attributes.friendly_name;
       this.name = fn ? fn : this.entity;
     }
   }
